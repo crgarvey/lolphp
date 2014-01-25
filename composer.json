@@ -1,0 +1,27 @@
+{
+    "name": "robbievaughn/lolphp",
+    "description": "PHP Wrapper for Riot Games (League of Legends) API",
+    "keywords": ["leagueoflegends", "riotapi"],
+    "homepage": "https://github.com/RobbieVaughn/lolphp",
+    "type": "library",
+    "license": "MIT",
+
+    "authors": [
+        {
+            "name": "Robbie Vaughn",
+            "homepage": "http://robbievaughn.me/"
+        }
+    ],
+
+    "require": {
+        "php": ">= 5.4.0",
+        "psr/log": "~1.0",
+        "zendframework/zend-config": "2.2.5"
+    },
+
+    "autoload": {
+        "psr-0": {
+            "Lolphp": "src/"
+        }
+    }
+}

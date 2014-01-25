@@ -1,0 +1,13 @@
+<?php
+/**
+ * Created for Lolphp on 1/24/14.
+ *
+ * @author Robbie Vaughn <robbie@robbievaughn.me>
+ */
+
+return [
+    'api'               => [
+        'url'           => 'https://prod.api.pvp.net/api/lol/',
+        'key'           => 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+    ]
+];
