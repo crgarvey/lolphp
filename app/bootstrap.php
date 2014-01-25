@@ -6,6 +6,7 @@
  */
 
 use Zend\Config\Config as ZendConfig;
+use Zend\Di\Di as ZendDi;
 use Lolphp\Connection;
 
 define('APPLICATION_PATH', realpath(__DIR__));
@@ -13,11 +14,22 @@ define('APPLICATION_PATH', realpath(__DIR__));
 require APPLICATION_PATH . '/../vendor/autoload.php';
 
 /**
+ * Dependency Injection Container
+ */
+
+// Instantiate Dependency Injection.
+$di                 = new ZendDi();
+
+/**
  * Configuration
  */
 
-// Instantiate an instance of ZendConfig and retrieve config.
-$config             = new ZendConfig(include APPLICATION_PATH . '/config/config.php');
+// Instantiate Configuration into Dependency Injection.
+$di->instanceManager()->addAlias(
+    'config',
+    get_class(new ZendConfig([])),
+    ['array' => include APPLICATION_PATH . '/config/config.php']
+);
 
 $connection         = new Connection(
     $config->api->url,
@@ -27,5 +39,5 @@ $connection         = new Connection(
 );
 
 // Example response for summoner 'jellybao' as a search.
-$response           = $connection->call('by-name/jellybao');
+$response           = $connection->call('by-name/jellybao', 'na');
 var_dump($response);
