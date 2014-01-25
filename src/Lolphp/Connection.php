@@ -20,36 +20,40 @@ class Connection
     const RESPONSE_JSON = 'json';
     const RESPONSE_XML  = 'xml';
 
+    /**
+     * Constants: Regions
+     */
     const REGION_NORTHAMERICA = 'na';
-    const SUMMONER_VERSION = 'v1.3';
+
+    /**
+     * Constants: API Methods
+     */
     const APIMETHOD_SUMMONER = 'summoner';
+
+    /**
+     * List of all API method versions
+     *
+     * @var array $apiMethodVersionList
+     */
+    public $apiMethodVersionList       = [
+        self::APIMETHOD_SUMMONER        => 'v1.3'
+    ];
 
     private $apiUrl = '';
     private $apiKey = '';
-    private $apiRegion = 'na';
-    private $apiMethod = '';
-    private $apiMethodVersion = '';
-    private $apiOperation = '';
-    private $version = '';
     private $responseType = self::RESPONSE_JSON;
     private $timeout = 15;
 
     /**
      * @param $apiUrl
      * @param $apiKey
-     * @param $apiMethod
-     * @param $apiMethodVersion
      */
     public function __construct(
         $apiUrl,
-        $apiKey,
-        $apiMethod,
-        $apiMethodVersion
+        $apiKey
     ) {
         $this->apiUrl = $apiUrl;
         $this->apiKey = $apiKey;
-        $this->apiMethod = $apiMethod;
-        $this->apiMethodVersion = $apiMethodVersion;
     }
 
     /**
@@ -88,27 +92,20 @@ class Connection
 
     /**
      * @param string $request
-     * @param string $region
      * @param array $fields
      * @param string $verb
-     * @throws \Exception
      * @return mixed
+     * @throws \Exception
      */
-    public function call($request = '', $region = self::REGION_NORTHAMERICA, Array $fields = [], $verb = self::VERB_GET)
-    {
+    public function call(
+        $request,
+        Array $fields = [],
+        $verb = self::VERB_GET
+    ) {
         // Append api_key to fields.
         $fields['api_key'] = $this->apiKey;
 
-        $curlPath = $this->apiUrl
-            . $this->apiRegion
-            . '/'
-            . $this->apiMethodVersion
-            . '/'
-            . $this->apiMethod
-            . '/'
-            . $request
-            ;
-
+        $curlPath = $this->apiUrl . $request;
         $ch = curl_init();
 
         $curlOpts = array(
@@ -149,7 +146,7 @@ class Connection
                 $message .= ' {' . $responseData->error . '}';
             }
 
-            throw new \Exception ($message, $e->getCode());
+            throw new \Exception($message, $e->getCode());
         }
 
         return $responseData;
