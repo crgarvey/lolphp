@@ -5,10 +5,18 @@
  * @author Robbie Vaughn <robbie@robbievaughn.me>
  */
 
+// Zend 2
 use Zend\Config\Config as ZendConfig;
 use Zend\Di\Di as ZendDi;
+// Phalcon
 use Phalcon\Cache\Frontend\Data as PhalconFrontendCache;
 use Phalcon\Cache\Backend\File as PhalconCache;
+use Phalcon\DI\FactoryDefault as PhalconDi;
+use Phalcon\Loader as PhalconLoader;
+use Phalcon\Mvc\Router as PhalconRouter;
+use Phalcon\Mvc\View as PhalconView;
+use Phalcon\Mvc\Application as PhalconApplication;
+// Lolphp
 use Lolphp\Connection;
 use Lolphp\Configuration;
 use Lolphp\RepositoryFactory;
@@ -18,60 +26,93 @@ define('APPLICATION_PATH', realpath(__DIR__));
 
 require APPLICATION_PATH . '/../vendor/autoload.php';
 
-/**
- * Dependency Injection Container
- */
-$di                                     = new ZendDi();
+try {
+    /**
+     * Cache
+     */
+    $cache = new PhalconCache(new PhalconFrontendCache([
+        "lifetime" => 172800
+    ]), [
+        "cacheDir" => APPLICATION_PATH . '/tmp/'
+    ]);
 
-/**
- * Configuration
- *
- * Instantiate Dependencies into Dependency Injection.
- */
+    /**
+     * Dependency Injection Container
+     */
+    $zendDi                                 = new ZendDi;
+    $phalconDi                              = new PhalconDi;
 
-// File Configuration
-$di->instanceManager()->addSharedInstance(
-    new ZendConfig(include APPLICATION_PATH . '/config/config.php'),
-    'config'
-);
+    $dependencyList                         = [
+        // File Configuration
+        [
+            'alias'                         => 'config',
+            'object'                        => new ZendConfig(include APPLICATION_PATH . '/config/config.php')
+        ],
+        // Repository Factory
+        [
+            'alias'                         => 'repositoryFactory',
+            'object'                        => new RepositoryFactory()
+        ],
+        // Cache
+        [
+            'alias'                         => 'cache',
+            'object'                        => $cache
+        ]
+    ];
+    /**
+     * Configuration
+     *
+     * Instantiate Dependencies into Dependency Injection.
+     */
 
-// Repository Factory
-$di->instanceManager()->addSharedInstance(
-    new RepositoryFactory(),
-    'repositoryFactory'
-);
+    // Zend 2: DI & Phalcon DI.
+    foreach ($dependencyList as $d) {
+        $alias      = $d['alias'];
+        $obj        = $d['object'];
 
-// Cache
-$cache = new PhalconCache(new PhalconFrontendCache([
-    "lifetime" => 172800
-]), [
-    "cacheDir" => APPLICATION_PATH . '/tmp/'
-]);
+        $zendDi->instanceManager()->addSharedInstance($obj, $alias);
+        $phalconDi->set($alias, $obj);
+    }
 
-$di->instanceManager()->addSharedInstance($cache, 'cache');
+    /**
+     * Instantiate Application Configuration
+     */
+    $applicationConfiguration               = new Configuration($zendDi);
+    $connection         = new Connection(
+        $zendDi->get('config')->api->url,
+        $zendDi->get('config')->api->key
+    );
 
-/**
- * Instantiate Application Configuration
- */
-$applicationConfiguration               = new Configuration($di);
-$connection         = new Connection(
-    $di->get('config')->api->url,
-    $di->get('config')->api->key
-);
+    $em                                     = new EntityManager($connection, $applicationConfiguration);
 
-$em                                     = new EntityManager($connection, $applicationConfiguration);
+    /**
+     * MVC Framework Support: Phalcon PHP
+     */
+    if ($zendDi->get('config')->mvc->isEnabled === true) {
+        // Phalcon Loader
+        $loader                             = new PhalconLoader;
+        $loader->registerNamespaces([
+            'Lolphp\Controller'             => APPLICATION_PATH . '/lolphp/controller'
+        ]);
+        $loader->register();
 
-/**
- * @var \Lolphp\Entity\Summoner $summoner
- */
-$summonerList = $em->getRepository(new \Lolphp\Entity\Summoner())->findBy(
-    ['summonerIds'  => ['43099783', '37533618']],
-    ['id']
-);
+        // Phalcon Router
+        $router                             = new PhalconRouter;
+        $router->setDefaultNamespace('Lolphp\Controller');
 
-var_dump($summonerList);
+        // Phalcon View
+        $view                               = new PhalconView();
+        $view->setViewsDir(APPLICATION_PATH . '/lolphp/view/');
 
-echo "<br> --- <br>";
+        // Inject dependencies
+        $phalconDi->set('loader', $loader);
+        $phalconDi->set('router', $router);
+        $phalconDi->set('view',  $view);
+        $phalconDi->set('em', $em);
 
-$summonerList = $em->getRepository(new \Lolphp\Entity\Summoner())->find(43099783);
-var_dump($summonerList);
+        $application                        = new PhalconApplication($phalconDi);
+        echo $application->handle()->getContent();
+    }
+} catch (\Exception $e) {
+    echo 'ERROR: ' . $e->getMessage();
+}

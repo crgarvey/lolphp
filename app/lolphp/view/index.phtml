@@ -1,0 +1,46 @@
+<?php
+
+use Phalcon\Assets\Manager as AssetsManager;
+
+/**
+ * @var AssetsManager $assets
+ */
+$assets = $this->assets;
+
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title><?= $this->view->pageTitle ?></title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <?= $assets->outputCss() ?>
+    </head>
+
+    <body>
+        <div class="container">
+            <br />
+            <nav class="navbar navbar-default">
+                <span class="navbar-brand">
+                    <?= $this->view->brandTitle ?>
+                </span>
+
+                <ul class="nav navbar-nav">
+                    <li><a href="/index">Home</a></li>
+                </ul>
+
+                <form id="navsearch" class="navbar-form navbar-right hidden-xs" role="search">
+                    <div class="form-group">
+                        <label for="summoner-search" class="sr-only">Summoner Name/ID</label>
+                        <input type="text" name="search" id="summoner-search" class="form-control" placeholder="Summoner ID/Name" />
+                    </div>
+                    &nbsp;
+                </form>
+            </nav>
+            <?= $this->view->getContent() ?>
+        </div><!-- /.container -->
+
+        <?= $assets->outputJs() ?>
+    </body>
+</html>

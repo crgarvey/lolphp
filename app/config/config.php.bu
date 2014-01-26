@@ -9,5 +9,8 @@ return [
     'api'               => [
         'url'           => 'https://prod.api.pvp.net/api/lol/',
         'key'           => 'XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX'
+    ],
+    'mvc'               => [
+        'isEnabled'     => true
     ]
 ];

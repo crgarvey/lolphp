@@ -134,14 +134,10 @@ class Summoner extends RepositoryAbstract
                 $summonerObj                        = new SummonerEntity($summonerData);
                 $hashedName                         = $cachePlugin->hash($summonerObj->getName());
                 $hashedId                           = $cachePlugin->hash($summonerObj->getId());
-                $cacheKey                           = "Summoner.${hashedId}.${hashedName}.cache";
+                $cacheKey                           = $this::CACHE_SUMMONER . ".${hashedId}.${hashedName}.cache";
                 $cache->save($cacheKey, $summonerObj, $this::CACHETTL_SUMMONER);
                 $outputList[]                       = $summonerObj;
             }
-        }
-
-        if (count($outputList) == 1) {
-            return reset($outputList);
         }
 
         if (!empty($orderBy)) {
@@ -159,6 +155,31 @@ class Summoner extends RepositoryAbstract
      */
     public function find($id)
     {
-        return $this->findBy([$this::CRITERIA_SUMMONERID   => (int) $id]);
+        return reset($this->findBy([$this::CRITERIA_SUMMONERID   => (int) $id]));
+    }
+
+    /**
+     * Returns all summoners from cache.
+     *
+     * @return array|null
+     */
+    public function findAll()
+    {
+        /**
+         * @var SummonerEntity $summoner
+         */
+        $cache                  = $this->entityManager->getConfiguration()->getCache();
+        $cachePlugin            = new CachePlugin($this->entityManager->getConfiguration());
+        $cacheKeyList           = $cachePlugin->getCacheKeys($this::CACHE_SUMMONER);
+
+        $summonerList           = null;
+        foreach ($cacheKeyList as $cacheKey) {
+            if ($cache->exists($cacheKey)) {
+                $summoner       = $cache->get($cacheKey);
+                $summonerList[] = $summoner;
+            }
+        }
+
+        return $summonerList;
     }
 }

@@ -39,4 +39,24 @@ class Cache extends BasePlugin
         return null;
     }
 
+    /**
+     * @param $wildcard
+     * @return array|null
+     */
+    public function getCacheKeys($wildcard = null)
+    {
+        $cacheDir      = $this->configuration->getCache()->getOptions()['cacheDir'];
+        $cacheKeys     = [];
+        foreach (glob($cacheDir . '*') as $filename) {
+            if (strpos($filename, $wildcard) !== false) {
+                $cacheKeys[] = basename($filename);
+            }
+        }
+
+        if (count($cacheKeys)) {
+            return $cacheKeys;
+        }
+
+        return null;
+    }
 }
