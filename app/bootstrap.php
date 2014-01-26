@@ -65,8 +65,13 @@ $em                                     = new EntityManager($connection, $applic
  * @var \Lolphp\Entity\Summoner $summoner
  */
 $summonerList = $em->getRepository(new \Lolphp\Entity\Summoner())->findBy(
-    ['summonerNames'  => ['jellybao', 'humpius']],
+    ['summonerIds'  => ['43099783', '37533618']],
     ['id']
 );
 
+var_dump($summonerList);
+
+echo "<br> --- <br>";
+
+$summonerList = $em->getRepository(new \Lolphp\Entity\Summoner())->find(43099783);
 var_dump($summonerList);

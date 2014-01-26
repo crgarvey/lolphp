@@ -65,7 +65,7 @@ class EntityManager implements EntityManagerInterface
     /**
      * @param array $request
      * @param string $region
-     * @param string $method
+     * @param mixed $method
      * @param array $fields
      * @param null|string $verb
      * @return mixed|\StdClass
@@ -79,6 +79,13 @@ class EntityManager implements EntityManagerInterface
     ) {
         $connection = $this->getConnection();
 
+        if (is_array($method)) {
+            $apiParamType  = $method[1];
+            $method        = $method[0];
+        } else {
+            $apiParamType      = $connection::APIMETHOD_PARAMTYPE_PREPEND;
+        }
+
         // Format request properly; region/method/methodVersion.
         $requestUrl        = $region
             . '/'
@@ -88,17 +95,28 @@ class EntityManager implements EntityManagerInterface
             . '/'
             ;
 
+        $firstRequest       = false;
         foreach ($request as $key => $value) {
-            if (is_array($key)) {
-                $key = implode(',', $key);
-            }
-
             if (is_array($value)) {
                 $value = implode(',', $value);
             }
 
             // Build the URL.
-            $requestUrl     .= $key . '/' . $value;
+            if (!$firstRequest) {
+                $firstRequest = true;
+
+                switch ($apiParamType) {
+                    case $connection::APIMETHOD_PARAMTYPE_APPEND:
+                        $requestUrl     .= $value . '/' . $key;
+                        break;
+
+                    case $connection::APIMETHOD_PARAMTYPE_PREPEND:
+                        $requestUrl     .= $key . '/' . $value;
+                        break;
+                }
+            } else {
+                $requestUrl     .= $key . '/' . $value;
+            }
         }
 
         return $connection->call($requestUrl, $fields);

@@ -27,6 +27,15 @@ class Configuration
     }
 
     /**
+     * @param $prop
+     * @return null|object
+     */
+    public function __get($prop)
+    {
+        return $this->di->get('config')->$prop;
+    }
+
+    /**
      * @return \Lolphp\RepositoryFactoryInterface
      */
     public function getRepositoryFactory()

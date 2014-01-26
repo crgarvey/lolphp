@@ -24,7 +24,7 @@ class Summoner extends EntityAbstract
     private $profileIconId;
 
     /**
-     * @var integer
+     * @var \DateTime
      */
     private $revisionDate;
 
@@ -102,7 +102,7 @@ class Summoner extends EntityAbstract
     }
 
     /**
-     * @return int
+     * @return \DateTime
      */
     public function getRevisionDate()
     {

@@ -20,6 +20,9 @@ class Connection
     const RESPONSE_JSON = 'json';
     const RESPONSE_XML  = 'xml';
 
+    const APIMETHOD_PARAMTYPE_PREPEND   = 0;
+    const APIMETHOD_PARAMTYPE_APPEND    = 1;
+
     /**
      * Constants: Regions
      */
