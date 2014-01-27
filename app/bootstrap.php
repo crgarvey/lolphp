@@ -46,7 +46,7 @@ try {
         // File Configuration
         [
             'alias'                         => 'config',
-            'object'                        => new ZendConfig([include APPLICATION_PATH . '/config/config.php'])
+            'object'                        => new ZendConfig(include APPLICATION_PATH . '/config/config.php')
         ],
         // Repository Factory
         [
