@@ -17,6 +17,14 @@ $(function () {
     var cache               = {};
     cache['summoner']       = {};
 
+    $('form.formurl').on('submit', function(e) {
+        e.preventDefault();
+        var url             = $(this).attr('action');
+
+        url                += '?' + $(this).serialize();
+        loadContent(url, 'body');
+    });
+
     $('#summoner-search').autocomplete({
         minLength: 3,
         source: function(request, response) {

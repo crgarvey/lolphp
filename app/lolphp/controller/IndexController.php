@@ -78,6 +78,7 @@ class IndexController extends ControllerBase
     public function summonerAction()
     {
         $id     = $this->request->get('id');
+        $search = $this->request->get('search', null, null);
 
         /**
          * @var SummonerRepository $repo
@@ -85,7 +86,12 @@ class IndexController extends ControllerBase
          */
         $repo           = $this->em->getRepository(new SummonerEntity());
         try {
-            $summoner       = $repo->find($id);
+            if ($search !== null) {
+                $summoner       = $repo->findBy([$repo::CRITERIA_SUMMONERNAME   => $search]);
+                $summoner       = $summoner[0];
+            } else {
+                $summoner       = $repo->find($id);
+            }
         } catch (\Exception $e) {
             $this->dispatcher->forward([
                 'controller'    => 'index',
