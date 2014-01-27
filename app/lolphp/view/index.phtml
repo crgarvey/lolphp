@@ -35,17 +35,16 @@ $assets = $this->assets;
                         <label for="summoner-search" class="sr-only">Summoner Name/ID</label>
                         <input type="text" name="term" id="summoner-search" class="form-control" placeholder="Summoner ID/Name" />
                     </div>
-                    <input type="submit" class="btn btn-navbar btn-default" value="Search" />
                     &nbsp;
                 </form>
             </nav>
-            <div class="visible-xs">
-                <form id="navsearch" class="navbar-form navbar-right hidden-xs" role="search" action="<?= $this->url->get('summoner/profile') ?>">
+            <div class="well well-sm visible-xs">
+                <form id="navsearch" class="form" role="search" action="<?= $this->url->get('summoner/profile') ?>">
                     <div class="form-group">
                         <label for="summoner-search" class="sr-only">Summoner Name/ID</label>
                         <input type="text" name="search" id="summoner-search" class="form-control" placeholder="Summoner ID/Name" />
                     </div>
-                    &nbsp;
+                    <input type="submit" class="btn btn-navbar btn-default" value="Search" />
                 </form>
             </div>
             <?= $this->view->getContent() ?>
