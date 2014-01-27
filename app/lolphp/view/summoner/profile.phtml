@@ -1,0 +1,55 @@
+<?php
+use Lolphp\Entity\Summoner as SummonerEntity;
+
+/**
+ * @var SummonerEntity $summoner
+ */
+$summoner       = $this->view->summoner;
+
+?>
+
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <span class="label label-default">ID: <?= $summoner->getId() ?></span>
+    </div>
+    <div class="panel-body">
+        <div class="row">
+            <div class="col-md-1">
+                <img
+                    src="http://lkimg.zamimg.com/shared/riot/images/profile_icons/profileIcon<?= $summoner->getProfileIconId() ?>.jpg"
+                    width="84px"
+                    height="84px"
+                />
+            </div>
+            <div class="col-md-6">
+                <h1>
+                    <?= $summoner->getName() ?>
+                </h1>
+            </div>
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-sm-6">
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Summoner Level</th>
+                        <td><?= $summoner->getSummonerLevel() ?></td>
+                    </tr>
+                </table>
+            </div>
+            <div class="col-sm-6">
+                <table class="table table-bordered">
+                    <tr>
+                        <th>Last Updated</th>
+                        <td><?= $summoner->getRevisionDate()->format('m-d-Y H:i:s A') ?></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="panel-footer">
+        <button class="btn btn-xs btn-default clipboard" data-to-copy="<?= $this->url->get('summoner/profile/' . $summoner->getId()) ?>">
+            <span class="glyphicon glyphicon-link"></span>
+        </button>
+    </div>
+</div>

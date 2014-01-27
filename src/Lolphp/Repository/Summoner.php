@@ -155,7 +155,12 @@ class Summoner extends RepositoryAbstract
      */
     public function find($id)
     {
-        return reset($this->findBy([$this::CRITERIA_SUMMONERID   => (int) $id]));
+        $result     = $this->findBy([$this::CRITERIA_SUMMONERID   => (int) $id]);
+        if (is_array($result)) {
+            return reset($result);
+        } else {
+            return $result;
+        }
     }
 
     /**

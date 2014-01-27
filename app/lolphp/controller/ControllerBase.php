@@ -33,12 +33,17 @@ class ControllerBase extends Controller
         $assets             = &$this->assets;
         $assets->addCss('css/bootstrap.min.css');
         $assets->addCss('css/jquery-ui-1.9.2.custom.css');
+        $assets->addCss('css/bootstrap-theme.min.css');
         $assets->addJs('js/jquery-2.1.0.min.js');
         $assets->addJs('js/jquery-ui-1.9.2.custom.min.js');
         $assets->addJs('js/bootstrap.min.js');
+        $assets->addJs('js/jquery.clipboard.js');
         $assets->addJs('js/lolphp.js');
 
         $this->setViewTitle('League of Legends API', 'League of Legends API');
+
+        $this->url->setBaseUri('http://' . $_SERVER['SERVER_NAME'] . '/');
+
     }
 
     /**

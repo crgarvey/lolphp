@@ -100,6 +100,9 @@ try {
         $router                             = new PhalconRouter;
         $router->setDefaultNamespace('Lolphp\Controller');
 
+        // Include routes.
+        include(APPLICATION_PATH . '/config/routes.php');
+
         // Phalcon View
         $view                               = new PhalconView();
         $view->setViewsDir(APPLICATION_PATH . '/lolphp/view/');
@@ -107,7 +110,7 @@ try {
         // Inject dependencies
         $phalconDi->set('loader', $loader);
         $phalconDi->set('router', $router);
-        $phalconDi->set('view',  $view);
+        $phalconDi->set('view', $view);
         $phalconDi->set('em', $em);
 
         $application                        = new PhalconApplication($phalconDi);
