@@ -25,7 +25,7 @@ $(function () {
         loadContent(url, 'body');
     });
 
-    $('#summoner-search').autocomplete({
+    $('.summoner-search').autocomplete({
         minLength: 3,
         source: function(request, response) {
             var term = request.term;
