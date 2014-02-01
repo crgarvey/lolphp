@@ -8,6 +8,7 @@ namespace Lolphp\Repository;
 
 use Lolphp\Entity\Summoner as SummonerEntity;
 use Lolphp\Plugin\Cache as CachePlugin;
+use Lolphp\Model\Region as Region;
 
 class Summoner extends RepositoryAbstract
 {
@@ -41,6 +42,9 @@ class Summoner extends RepositoryAbstract
 
         $connection                         = $this->entityManager->getConnection();
         $apiList                            = null;
+        $region                             = (new Region())->validateRegion(@($criteria[$this::CRITERIA_REGION]));
+        $hashedRegion                       = $cachePlugin->hash($region);
+
         foreach ($criteria as $type => &$search) {
 
             // Search must be an array.
@@ -71,7 +75,7 @@ class Summoner extends RepositoryAbstract
                  */
                 foreach ($search as $key => $value) {
                     $hashedValue                  = $cachePlugin->hash($value);
-                    $cacheKey                     = $cachePlugin->getCacheKeyWildcard($hashedValue);
+                    $cacheKey                     = $cachePlugin->getCacheKeyWildcard([$hashedValue, $hashedRegion]);
                     $cacheExists                  = (bool) @($cache->exists($cacheKey));
 
                     if (!empty($cacheKey) && $cacheExists === true) {
@@ -130,11 +134,17 @@ class Summoner extends RepositoryAbstract
                     $summonerData->revisionDate
                 );
 
+                // Set the region in summonerData.
+                $summonerData->region               = $region;
+
                 // Instantiate SummonerEntity.
                 $summonerObj                        = new SummonerEntity($summonerData);
                 $hashedName                         = $cachePlugin->hash($summonerObj->getName());
                 $hashedId                           = $cachePlugin->hash($summonerObj->getId());
-                $cacheKey                           = $this::CACHE_SUMMONER . ".${hashedId}.${hashedName}.cache";
+                $cacheKey                           =
+                    $this::CACHE_SUMMONER .
+                    ".${hashedId}.${hashedName}.${hashedRegion}.cache"
+                ;
                 $cache->save($cacheKey, $summonerObj, $this::CACHETTL_SUMMONER);
                 $outputList[]                       = $summonerObj;
             }
@@ -155,7 +165,31 @@ class Summoner extends RepositoryAbstract
      */
     public function find($id)
     {
-        $result     = $this->findBy([$this::CRITERIA_SUMMONERID   => (int) $id]);
+        /**
+         * @var SummonerEntity $summoner
+         */
+        $cache                  = $this->entityManager->getConfiguration()->getCache();
+        $cachePlugin            = new CachePlugin($this->entityManager->getConfiguration());
+        $cacheKeyList           = $cachePlugin->getCacheKeys($this::CACHE_SUMMONER);
+        $idHash                 = $cachePlugin->hash($id);
+        $summoner               = null;
+
+        foreach ($cacheKeyList as $cacheKey) {
+            if (stripos($cacheKey, $idHash)) {
+                $summoner       = $cache->get($cacheKey);
+                break;
+            }
+        }
+
+        if (!empty($summoner)) {
+            $result             = $this->findBy([
+                $this::CRITERIA_SUMMONERNAME        => $summoner->getName(),
+                $this::CRITERIA_REGION              => $summoner->getRegion()
+            ]);
+        } else {
+            $result     = $this->findBy([$this::CRITERIA_SUMMONERID   => (int) $id]);
+        }
+
         if (is_array($result)) {
             return reset($result);
         } else {

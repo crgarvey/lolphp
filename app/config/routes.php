@@ -11,7 +11,7 @@ use Phalcon\Mvc\Router as PhalconRouter;
  * @var PhalconRouter $router
  */
 $router->add(
-    '/summoner/{action}/{term}',
+    '/summoner/{action}/{region}/{term}',
     [
         'controller'        => 'summoner',
         'action'            => 1

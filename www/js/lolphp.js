@@ -13,6 +13,23 @@ function loadContent(url, element, onComplete) {
     $(element).html(getLoadingHtml()).load(url, {}, onComplete);
 }
 
+function getEnv() {
+    var envs = ['xs', 'sm', 'md', 'lg'];
+
+    $el = $('<div>');
+    $el.appendTo($('body'));
+
+    for (var i = envs.length - 1; i >= 0; i--) {
+        var env = envs[i];
+
+        $el.addClass('hidden-'+env);
+        if ($el.is(':hidden')) {
+            $el.remove();
+            return env;
+        }
+    }
+}
+
 $(function () {
     var cache               = {};
     cache['summoner']       = {};
@@ -28,7 +45,11 @@ $(function () {
     $('.summoner-search').autocomplete({
         minLength: 3,
         source: function(request, response) {
-            var term = request.term;
+            request.region  = $('#region').val();
+            if (getEnv() == 'xs') {
+                request.region = $('#region-xs').val();
+            }
+            var term        = request.term + '_' + request.region;
             if ( term in cache ) {
                 response( cache[ term ] );
                 return;
@@ -40,10 +61,11 @@ $(function () {
             });
         },
         select: function(event, ui) {
-            var value = ui.item.value;
+            var value   = ui.item.value;
+            var region  = ui.item.region;
 
             if (typeof value != 'undefined') {
-                loadContent('/summoner/profile?term=' + value, 'body');
+                loadContent('/summoner/profile?term=' + value + '&region=' + region, 'body');
             }
         }
     });

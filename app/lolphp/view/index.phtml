@@ -33,7 +33,18 @@ $assets = $this->assets;
                 <form id="navsearch" class="navbar-form navbar-right formurl hidden-xs" role="search" action="<?= $this->url->get('summoner/profile') ?>">
                     <div class="form-group">
                         <label for="summoner-search" class="sr-only">Summoner Name/ID</label>
-                        <input type="text" name="term" class="summoner-search form-control" placeholder="Summoner ID/Name" />
+                        <input type="text" name="term" id="summoner-search" class="summoner-search form-control" placeholder="Summoner ID/Name" />
+                    </div>
+                    <div class="form-group">
+                        <label for="region" class="sr-only">Region</label>
+                        <select id="region" class="form-control">
+                            <?php foreach ($this->view->regionList as $selectValue => $selectLabel): ?>
+                            <option value="<?= $selectValue ?>"
+                                <?php if ($selectValue == $this->view->region): ?> selected<?php endif ?>>
+                                <?= $selectLabel ?>
+                            </option>
+                            <?php endforeach ?>
+                        </select>
                     </div>
                     <input type="submit" class="btn btn-navbar btn-default" value="Search" />
                     &nbsp;
@@ -44,6 +55,17 @@ $assets = $this->assets;
                     <div class="form-group">
                         <label for="summoner-search" class="sr-only">Summoner Name/ID</label>
                         <input type="text" name="term" class="summoner-search form-control" placeholder="Summoner ID/Name" />
+                    </div>
+                    <div class="form-group">
+                        <label for="region-xs" class="sr-only">Region</label>
+                        <select id="region-xs" class="form-control">
+                            <?php foreach ($this->view->regionList as $selectValue => $selectLabel): ?>
+                                <option value="<?= $selectValue ?>"
+                                    <?php if ($selectValue == $this->view->region): ?> selected<?php endif ?>>
+                                    <?= $selectLabel ?>
+                                </option>
+                            <?php endforeach ?>
+                        </select>
                     </div>
                     <div class="form-group">
                         <input type="submit" class="btn btn-navbar btn-default" value="Search" />

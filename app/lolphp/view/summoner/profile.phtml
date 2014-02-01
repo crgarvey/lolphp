@@ -48,7 +48,7 @@ $summoner       = $this->view->summoner;
         </div>
     </div>
     <div class="panel-footer">
-        <button class="btn btn-xs btn-default clipboard" data-to-copy="<?= $this->url->get('summoner/profile/' . $summoner->getId()) ?>">
+        <button class="btn btn-xs btn-default clipboard" data-to-copy="<?= $this->url->get('summoner/profile/' . $this->view->region . '/' . $summoner->getId()) ?>">
             <span class="glyphicon glyphicon-link"></span>
         </button>
     </div>

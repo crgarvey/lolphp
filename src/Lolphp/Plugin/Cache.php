@@ -24,12 +24,17 @@ class Cache extends BasePlugin
     /**
      * Searches the cache directory.
      *
-     * @param $wildcard
-     * @return null|string
+     * @param       mixed       $wildcard
+     * @return      null|string
      */
     public function getCacheKeyWildcard($wildcard)
     {
         $cacheDir      = $this->configuration->getCache()->getOptions()['cacheDir'];
+
+        // Wildcard param as an array (implode).
+        if (is_array($wildcard)) {
+            $wildcard           = implode('.', $wildcard);
+        }
 
         foreach (glob($cacheDir . '*') as $filename) {
             if (strpos($filename, $wildcard) !== false) {

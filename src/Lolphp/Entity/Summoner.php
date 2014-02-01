@@ -34,6 +34,11 @@ class Summoner extends EntityAbstract
     private $summonerLevel;
 
     /**
+     * @var string
+     */
+    private $region;
+
+    /**
      * @param $id
      * @return Summoner
      */
@@ -126,5 +131,24 @@ class Summoner extends EntityAbstract
     public function getSummonerLevel()
     {
         return $this->summonerLevel;
+    }
+
+    /**
+     * @param $region
+     * @return $this
+     */
+    public function setRegion($region)
+    {
+        $this->region = $region;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRegion()
+    {
+        return $this->region;
     }
 }

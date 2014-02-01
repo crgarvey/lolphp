@@ -15,13 +15,26 @@ class SummonerController extends ControllerBase
 
     public function initialize()
     {
+        $requestList                = ['term', 'region'];
+
+        foreach ($requestList as $requestName) {
+            $value                  = $this->dispatcher->getParam($requestName);
+
+            if (empty($value)) {
+                $value              = $this->request->get($requestName);
+            }
+
+            $this->$requestName     = $value;
+        }
+
+        /*
         $term               = $this->dispatcher->getParam('term');
         if (empty($term)) {
             $term           = $this->request->get('term');
         }
 
         $this->term         = $term;
-
+        */
         parent::initialize();
     }
 
@@ -29,6 +42,7 @@ class SummonerController extends ControllerBase
     {
         $term               = $this->term;
         $term               = explode(',', $term);
+        $region             = $this->region;
 
         /**
          * @var SummonerRepository $repo
@@ -39,9 +53,15 @@ class SummonerController extends ControllerBase
         if ($term !== null) {
             try {
                 if (is_numeric($term)) {
-                    $summonerList   = $repo->findBy([$repo::CRITERIA_SUMMONERID => $term]);
+                    $summonerList   = $repo->findBy([
+                        $repo::CRITERIA_SUMMONERID => $term,
+                        $repo::CRITERIA_REGION     => $region
+                    ]);
                 } else {
-                    $summonerList   = $repo->findBy([$repo::CRITERIA_SUMMONERNAME => $term]);
+                    $summonerList   = $repo->findBy([
+                        $repo::CRITERIA_SUMMONERNAME => $term,
+                        $repo::CRITERIA_REGION       => $region
+                    ]);
                 }
             } catch (\Exception $e) {
                 exit;
@@ -56,6 +76,12 @@ class SummonerController extends ControllerBase
                         continue;
                     }
 
+                    // Check the region.
+                    if (stripos($s->getRegion(), $region) === false) {
+                        continue;
+                    }
+
+                    // Check the term.
                     foreach ($term as $t) {
                         if (stripos($s->getName(), $t) !== false) {
                             $summonerList[]     = $s;
@@ -74,7 +100,8 @@ class SummonerController extends ControllerBase
             foreach ($summonerList as $s) {
                 array_push($resultList, [
                     'value'            => $s->getId(),
-                    'label'            => $s->getName()
+                    'label'            => $s->getName(),
+                    'region'           => $region
                 ]);
             }
 
@@ -86,6 +113,7 @@ class SummonerController extends ControllerBase
     public function profileAction()
     {
         $term           = $this->term;
+        $region         = $this->region;
 
         /**
          * @var SummonerRepository $repo
@@ -96,7 +124,10 @@ class SummonerController extends ControllerBase
             if (is_numeric($term)) {
                 $summoner       = $repo->find((int) $term);
             } else {
-                $summoner       = $repo->findBy([$repo::CRITERIA_SUMMONERNAME   => $term]);
+                $summoner       = $repo->findBy([
+                    $repo::CRITERIA_SUMMONERNAME   => $term,
+                    $repo::CRITERIA_REGION         => $region
+                ]);
                 $summoner       = $summoner[0];
             }
         } catch (\Exception $e) {

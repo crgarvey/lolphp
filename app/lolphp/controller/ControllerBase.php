@@ -9,6 +9,7 @@ namespace Lolphp\Controller;
 use Phalcon\Mvc\Controller;
 use Phalcon\Assets\Manager as AssetsManager;
 use Lolphp\EntityManagerInterface;
+use Lolphp\Model\Region as Region;
 
 class ControllerBase extends Controller
 {
@@ -44,6 +45,13 @@ class ControllerBase extends Controller
 
         $this->url->setBaseUri('http://' . $_SERVER['SERVER_NAME'] . '/');
 
+        $this->getRequestSetVars(['region']);
+
+        // Instantiate Region Object.
+        $regionObj              = new Region;
+
+        $this->view->setVar('regionList', $regionObj->getPairs());
+        $this->view->setVar('region', $this->region);
     }
 
     /**
@@ -57,5 +65,24 @@ class ControllerBase extends Controller
             'brandTitle'            => $brandTitle
         ]);
 
+    }
+
+    /**
+     * Using an array of request path/param names, get and set to internal class variables.
+     *
+     * @param       array       $requestList
+     * @return      void
+     */
+    protected function getRequestSetVars(Array $requestList)
+    {
+        foreach ($requestList as $requestName) {
+            $value                  = $this->dispatcher->getParam($requestName);
+
+            if (empty($value)) {
+                $value              = $this->request->get($requestName);
+            }
+
+            $this->$requestName     = $value;
+        }
     }
 }
